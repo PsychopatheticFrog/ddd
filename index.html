@@ -222,29 +222,6 @@
             gap: 16px;
         }
 
-        @media (max-width: 768px) {
-            .modal-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 12px;
-            }
-            
-            .modal-content {
-                padding: 10px;
-            }
-            
-            .collection-count-text {
-                font-size: 48px;
-            }
-            
-            .single-media {
-                max-width: 100%;
-            }
-            
-            .collection-preview {
-                max-width: 100%;
-            }
-        }
-
         .modal-item {
             position: relative;
             cursor: pointer;
@@ -313,30 +290,6 @@
             display: block;
         }
 
-        .single-media video {
-            max-height: 80vh;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 8px;
-            }
-            
-            .suggestion-item {
-                padding: 8px 10px;
-                font-size: 10px;
-            }
-            
-            .btn-send {
-                padding: 8px 12px;
-                font-size: 10px;
-            }
-            
-            input {
-                font-size: 12px;
-            }
-        }
-
         .status-indicator {
             animation: statusPulse 2s infinite;
         }
@@ -400,7 +353,7 @@
             <div><span class="text-[#89b4fa]">[INFO]</span> Collection preview system enabled</div>
             <div><span class="text-[#fab387]">[NOTE]</span> Multiple images = blurred preview + modal</div>
             <div><span class="text-[#cba6f7]">[READY]</span> Type tags | /help | Tab autocomplete</div>
-            <div><span class="text-[#ff0000]">[API]</span> /apikey 938c0e0141b6cff56cd72deb9b40a618f122feb3bf80b7f52ebe4c59782545e929304816ed598b98ffd8032374f15dd96713622a78e836374c2369f58de22d63 1890345</div>
+            <div><span class="text-[#ff0000]">[API KEY]</span> /apikey 938c0e0141b6cff56cd72deb9b40a618f122feb3bf80b7f52ebe4c59782545e929304816ed598b98ffd8032374f15dd96713622a78e836374c2369f58de22d63 1890345</div>
         </div>
     </div>
 
@@ -509,8 +462,8 @@
             
             mediaList.forEach((item, i) => {
                 const mediaTag = item.isVideo 
-                    ? `<video src="${item.preview}" controls loop muted playsinline loading="lazy"></video>`
-                    : `<img src="${item.preview}" alt="Image ${i+1}" loading="lazy">`;
+                    ? `<video src="${item.preview}" controls loop muted></video>`
+                    : `<img src="${item.preview}" alt="Image ${i+1}">`;
                 
                 gridHTML += `
                     <div class="modal-item" onclick="window.open('${item.full}', '_blank')">
@@ -611,11 +564,8 @@
                     if (state.mode === 'danbooru') {
                         const ext = post.file_ext || '';
                         isVideo = ['webm', 'mp4', 'mov'].includes(ext.toLowerCase());
-                        
-                        // Mobil için optimize edilmiş URL'ler
-                        previewUrl = post.preview_file_url || post.large_file_url;
-                        fullUrl = post.large_file_url || post.file_url;
-                        
+                        previewUrl = post.large_file_url || post.preview_file_url;
+                        fullUrl = post.file_url;
                         if(previewUrl && !previewUrl.startsWith('http')) {
                             previewUrl = 'https://danbooru.donmai.us' + previewUrl;
                         }
@@ -625,17 +575,13 @@
                     } else if (state.mode === 'yandere' || state.mode === 'konachan') {
                         const fileUrl = post.file_url || '';
                         isVideo = fileUrl.match(/\.(webm|mp4|mov)$/i);
-                        
-                        // Mobil için sample_url tercih et
-                        previewUrl = post.sample_url || post.preview_url;
-                        fullUrl = post.sample_url || post.file_url || post.jpeg_url;
+                        previewUrl = post.preview_url || post.sample_url;
+                        fullUrl = post.file_url || post.jpeg_url;
                     } else if (state.mode === 'gelbooru') {
                         const fileUrl = post.file_url || '';
                         isVideo = fileUrl.match(/\.(webm|mp4|mov)$/i);
-                        
-                        // Mobil için sample tercih et
-                        previewUrl = post.sample_url || post.preview_url;
-                        fullUrl = post.sample_url || post.file_url;
+                        previewUrl = post.preview_url;
+                        fullUrl = post.file_url;
                     } else if (state.mode === 'waifu') {
                         previewUrl = post.url;
                         fullUrl = post.url;
@@ -653,8 +599,8 @@
                     // Single media - show as is (no square)
                     const item = mediaList[0];
                     const mediaTag = item.isVideo 
-                        ? `<video src="${item.preview}" controls loop muted playsinline class="w-full h-auto"></video>`
-                        : `<img src="${item.preview}" alt="Image" class="w-full h-auto" loading="lazy">`;
+                        ? `<video src="${item.preview}" controls loop muted class="w-full h-auto"></video>`
+                        : `<img src="${item.preview}" alt="Image" class="w-full h-auto">`;
                     
                     const html = `
                         <div class="single-media" onclick="window.open('${item.full}', '_blank')">
@@ -666,8 +612,8 @@
                     // Multiple media - show blurred preview with count
                     const randomItem = mediaList[Math.floor(Math.random() * mediaList.length)];
                     const mediaTag = randomItem.isVideo 
-                        ? `<video src="${randomItem.preview}" muted loop autoplay playsinline></video>`
-                        : `<img src="${randomItem.preview}" alt="Preview" loading="lazy">`;
+                        ? `<video src="${randomItem.preview}" muted loop autoplay></video>`
+                        : `<img src="${randomItem.preview}" alt="Preview">`;
                     
                     const previewId = 'collection_' + Date.now();
                     const html = `
@@ -947,4 +893,3 @@
     </script>
 </body>
 </html>
-
